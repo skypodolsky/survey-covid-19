@@ -66,44 +66,58 @@ antivax_stats_df = antivax_df = df[df['Ви вакциновані:'] == 'Ні']
 
 df.to_csv('survey-final.csv', sep='\t', index=False)
 
-for df, name in [(vax_stats_df, 'vax'), (antivax_stats_df, 'antivax')]:
-    #  print(df)
-    #  fig, axes = plt.subplots(nrows = 2, ncols = 1, figsize=(10,10))
+for df, name in [(vax_stats_df, 'vax')]: #, (antivax_stats_df, 'antivax')]:
 
     counts_series = df['basic_classification'].value_counts()
-    counts_sum = counts_series.sum()
     labels = counts_series.index.tolist()
-    counts = counts_series.values
-    percents = counts / counts_sum * 100
+    counts = counts_series.values.tolist()
+    percents = counts / counts_series.sum() * 100
+    percents = percents.tolist()
 
-    #  print(counts_sum)
-    #  print(labels)
-    #  print(counts)
+    print(percents)
+    print('===')
+    other = 0
+    changed = False
+    for percent in reversed(percents):
+        if percent <= 5:
+            changed = True
+            other += percent
+            print('drop percentage {}'.format(percent))
+            #  counts.pop()
+            percents.pop()
+            labels.pop()
 
+    if changed:
+        percents.append(other)
+        labels.append('Інші')
+
+    print(percents)
     res = zip(labels, percents)
 
     fin_labels = []
-    for i,j in res:
-        e_num = 50
-        templ = '{' + ': <{}'.format(e_num) + '} - {:.2f} %'
-        st = templ.format(i, j)
-        fin_labels.append(st)
+    for i, j in res:
+        fin_labels.append('{:} - {:.2f} %'.format(i, j))
 
-    explode = np.full(len(fin_labels), 0.03)
+    fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
-    plot = df['basic_classification'].value_counts().plot.pie(autopct='%.1f%%', startangle=0, fontsize=10, pctdistance=0.6, explode=explode, labels=fin_labels)
-    plot.set_xlabel('Офіційна класифікація (' + name + ')',fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
-    #plot.legend(loc='upper right', frameon=True)
-    #plot.legend(loc=' ', fancybox=True, framealpha=1, shadow=True, borderpad=1)
-    plot.legend(loc='upper left', bbox_to_anchor=(1, 1.05),
-          ncol=1, fancybox=True, shadow=True)
+    data = percents
 
-    plt.tight_layout()
+    wedges, texts = ax.pie(data, wedgeprops=dict(width=0.5), startangle=-40)
+
+    bbox_props = dict(boxstyle="square,pad=0.1", fc="w", ec="k", lw=0.72)
+    kw = dict(arrowprops=dict(arrowstyle="-"),
+          bbox=bbox_props, zorder=0, va="center")
+
+    for i, p in enumerate(wedges):
+        ang = (p.theta2 - p.theta1)/2. + p.theta1
+        y = np.sin(np.deg2rad(ang))
+        x = np.cos(np.deg2rad(ang))
+        horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
+        connectionstyle = "angle,angleA=0,angleB={}".format(ang)
+        kw["arrowprops"].update({"connectionstyle": connectionstyle})
+        ax.annotate(fin_labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
+                horizontalalignment=horizontalalignment, **kw)
+
+    ax.set_title("Розподіл вибірки респондентів за стандартною класифікацією професій")
+
     plt.show()
-    #  plot = df['modified_classification'].value_counts().plot.pie(ax=axes[1], autopct='%.1f%%', startangle=0, fontsize=5)
-    #  plot.set_xlabel('Авторська класифікація (' + name + ')',fontsize = 10)
-    #  plot.set_ylabel('', fontsize = 10)
-
-    #  plt.show()
-    #  fig.savefig('specialities-' + name + '.png', dpi=200)
