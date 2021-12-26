@@ -5,17 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 df = pd.read_csv('survey-raw.csv', sep='\t')
-#  print(df.dropna(axis = 0, how = 'any'))
 
-#  print(df)
-
-#  antivax_stats_df = antivax_stats_df.drop('Timestamp', 1)
-#  antivax_stats_df = antivax_stats_df.drop('Коротко про те, ким ви працюєте:', 1)
-#  antivax_stats_df = antivax_stats_df.drop('У чому, на вашу думку, основна причина відмови людей від вакцинації?', 1)
-
-#  for df, name in [(vax_stats_df, 'vax'), (antivax_stats_df, 'antivax')]:
-    
-#plot = df.plot(x="Timestamp", y=['Ви вакциновані:'])
 vaxed = 0
 not_vaxed = 0
 for index, row in df.iterrows():
