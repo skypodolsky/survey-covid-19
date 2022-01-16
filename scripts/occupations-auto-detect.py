@@ -121,7 +121,6 @@ for index, row in df.iterrows():
     # compare the whole phrase
     ret = similar(value, specialities)
     if ret[0] > 0.7:
-        #  print('+++++++ ' + ret[1])
         df.at[index, 'category'] = str(ret[2]) + '-' + str(ret[3])
         df.at[index, 'probability'] = ret[0]
         df.at[index, 'speciality_auto_detected'] = ret[1]

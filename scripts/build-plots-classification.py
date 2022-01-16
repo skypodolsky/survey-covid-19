@@ -6,20 +6,6 @@ import matplotlib.pyplot as plt
 
 colors = [ 'blue', 'orange', 'red', 'green', 'purple', 'brown', 'gray', 'pink' ]
 
-#  basic_classification = [
-#              "Законодавці, вищі державні службовці, керівники, менеджери (управителі)",
-#              "Професіонали",
-#              "Фахівці",
-#              "Технічні службовці",
-#              "Працівники сфери торгівлі та послуг",
-#              "Кваліфіковані робітники сільського та лісового господарств, риборозведення та рибальства",
-#              "Кваліфіковані робітники з інструментом",
-#              "Робітники з обслуговування, експлуатації та контролювання за роботою технологічного устаткування, складання устаткування та машин",
-#              "Найпростіші професії",
-#              "Незайняті (пенсіонери, безробітні, декрет)",
-#              "Незайняті (школярі, студенти)"
-#          ]
-
 basic_classification = [
             "ЗВДСКМ(У)",
             "Професіонали",
@@ -119,8 +105,6 @@ for df, name in [(vax_stats_df, 'vax'), (antivax_stats_df, 'antivax')]:
             kw["arrowprops"].update({"connectionstyle": connectionstyle})
             ax.annotate(fin_labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                     horizontalalignment=horizontalalignment, **kw, fontsize=11)
-
-        #  ax.set_title(desc)
 
         mng = plt.get_current_fig_manager()
         mng.full_screen_toggle()
