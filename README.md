@@ -1,3 +1,4 @@
 # survey-covid-19
 
-https://docs.google.com/forms/d/1RuaCtlYOmyT-XzwAraEEhneo2QURBrxicyZUQu8jKN8/edit#responses
+https://drive.google.com/drive/folders/17tcIUZ_bqJjpyLcmI_tPyhqx5CwYxk2_?usp=sharing
+
