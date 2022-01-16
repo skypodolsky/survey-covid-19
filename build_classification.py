@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+colors = [ 'blue', 'orange', 'red', 'green', 'purple', 'brown', 'gray', 'pink' ]
+
 #  basic_classification = [
 #              "Законодавці, вищі державні службовці, керівники, менеджери (управителі)",
 #              "Професіонали",
@@ -69,7 +71,7 @@ df.to_csv('survey-final.csv', sep='\t', index=False)
 for df, name in [(vax_stats_df, 'vax'), (antivax_stats_df, 'antivax')]:
     for classification, desc in [ ('basic_classification', 'Розподіл вибірки респондентів за стандартною класифікацією професій'), ('modified_classification', 'Розподіл вибірки респондентів за модифікованою класифікацією професій') ]:
 
-        counts_series = df[classification].value_counts()
+        counts_series = df[classification].value_counts()#.sort_index(ascending=False)
         labels = counts_series.index.tolist()
         counts = counts_series.values.tolist()
         percents = counts / counts_series.sum() * 100
@@ -102,7 +104,7 @@ for df, name in [(vax_stats_df, 'vax'), (antivax_stats_df, 'antivax')]:
 
         fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
-        wedges, texts = ax.pie(percents, wedgeprops=dict(width=0.5), startangle=-40)
+        wedges, texts = ax.pie(percents, colors=colors, wedgeprops=dict(width=0.5), startangle=-40)
 
         bbox_props = dict(boxstyle="square,pad=0.1", fc="w", ec="k", lw=0.72)
         kw = dict(arrowprops=dict(arrowstyle="-"),
@@ -116,7 +118,7 @@ for df, name in [(vax_stats_df, 'vax'), (antivax_stats_df, 'antivax')]:
             connectionstyle = "angle,angleA=0,angleB={}".format(ang)
             kw["arrowprops"].update({"connectionstyle": connectionstyle})
             ax.annotate(fin_labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
-                    horizontalalignment=horizontalalignment, **kw)
+                    horizontalalignment=horizontalalignment, **kw, fontsize=11)
 
         #  ax.set_title(desc)
 

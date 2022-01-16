@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -10,70 +11,58 @@ print(df)
 
 vax_stats_df = vax_df = df[df['Ви вакциновані:'] == 'Так']
 antivax_stats_df = antivax_df = df[df['Ви вакциновані:'] == 'Ні']
+colors = [ 'blue', 'orange', 'red', 'green', 'purple', 'brown', 'gray', 'pink' ]
 
 #  antivax_stats_df = antivax_stats_df.drop('Timestamp', 1)
 #  antivax_stats_df = antivax_stats_df.drop('Коротко про те, ким ви працюєте:', 1)
 #  antivax_stats_df = antivax_stats_df.drop('У чому, на вашу думку, основна причина відмови людей від вакцинації?', 1)
 
+cols = [ 'Ваш вік', 'Чи вважаєте Ви COVID-19 небезпечним респіраторним захворюванням?', 'Чи довіряєте Ви уряду щодо кампанії вакцинації від COVID-19?', 'Чи довіряєте Ви сфері медицини, окрім кампанії вакцинації?', 'В цілому, я довіряю новинам:', 'Я вважаю, що усунення від роботи невакцинованих співробітників погіршує ситуацію:', 'Як багато Ваших знайомих вакциновано?', 'Ви готові придбати або вже придбали підроблений сертифікат COVID-19:', 'Крім питання персональної довіри до вакцин, в цілому ви ставитеся до вакцинації від COVID-19:', 'Незалежно від позиції по вакцинації, ви відстоюєте її:', 'Ви часто приєднуєтеся до громадських мітингів на важливі для вас теми:' ]
+#cols = [ 'Як ваше рішення щодо вакцинації позначилося на ставленні людей до вас?', 'Як епідемія вплинула на ваших знайомих?' ]
+
+count = 0
 for df, name in [(vax_stats_df, 'vax'), (antivax_stats_df, 'antivax')]:
+
+    for col in cols:
+        count += 1
+        counts_series = df[col].value_counts().sort_index(ascending=False)
+        labels = counts_series.index.tolist()
+        counts = counts_series.values.tolist()
+        percents = counts / counts_series.sum() * 100
+        percents = percents.tolist()
+
+        print(percents)
+        print(labels)
+        print('===')
     
-    fig, axes = plt.subplots(nrows = 4, ncols = 3, figsize=(4,4))
+        res = zip(labels, percents)
 
-    plot = df['Ваш вік'].value_counts().plot.pie(ax=axes[0, 0], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Вік респондентів',fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
-    #  plot.legend(frameon=True)
+        fin_labels = []
+        for i, j in res:
+            fin_labels.append('{:} - {:.2f} %'.format(i, j))
 
-    plot = df['Чи довіряєте Ви сфері медицини, окрім кампанії вакцинації?'].value_counts().plot.pie(ax=axes[0, 1], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Довіра до медицини (за виключенням кампанії вакцинації)', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
+#        fin_labels.sort()
+        fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
 
-    plot = df['В цілому, я довіряю новинам:'].value_counts().plot.pie(ax=axes[0, 2], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Довіра до ЗМІ', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
+        wedges, texts = ax.pie(percents, colors=colors, wedgeprops=dict(width=0.5), startangle=-40)
 
-    ###
+        bbox_props = dict(boxstyle="square,pad=0.5", fc="w", ec="k", lw=0.72)
+        kw = dict(arrowprops=dict(arrowstyle="-"),
+                bbox=bbox_props, zorder=0, va="center")
 
-    plot = df['Я вважаю, що усунення від роботи невакцинованих співробітників погіршує ситуацію:'].value_counts().plot.pie(ax=axes[1, 0], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Усунення від роботи невакцинованих співробітників погіршує ситуацію', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
+        for i, p in enumerate(wedges):
+            ang = (p.theta2 - p.theta1)/2. + p.theta1
+            y = np.sin(np.deg2rad(ang))
+            x = np.cos(np.deg2rad(ang))
+            horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
+            connectionstyle = "angle,angleA=0,angleB={}".format(ang)
+            kw["arrowprops"].update({"connectionstyle": connectionstyle})
+            ax.annotate(fin_labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
+                    horizontalalignment=horizontalalignment, **kw, fontsize=14)
 
-    plot = df['Як багато Ваших знайомих вакциновано?'].value_counts().plot.pie(ax=axes[1, 1], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Частка вакцинованих знайомих', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
+        mng = plt.get_current_fig_manager()
+        mng.full_screen_toggle()
 
-    plot = df['Як ваше рішення щодо вакцинації позначилося на ставленні людей до вас?'].value_counts().plot.pie(ax=axes[1, 2], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Рішення щодо вакцинації позначилося на респондентах', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
+        plt.show()
 
-    ###
-
-    plot = df['Як епідемія вплинула на ваших знайомих?'].value_counts().plot.pie(ax=axes[2, 0], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Як епідемія вплинула на ваших знайомих?', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
-
-    plot = df['Ви готові придбати або вже придбали підроблений сертифікат COVID-19:'].value_counts().plot.pie(ax=axes[2, 1], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Чи готові придбати або вже придбали підроблений сертифікат', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
-
-    plot = df['Крім питання персональної довіри до вакцин, в цілому ви ставитеся до вакцинації від COVID-19:'].value_counts().plot.pie(ax=axes[2, 2], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Ставлення до вакцинації (за виключенням персональної довіри до вакцин)', fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
-
-    ###
-
-    plot = df['Незалежно від позиції по вакцинації, ви відстоюєте її:'].value_counts().plot.pie(ax=axes[3, 0], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Незалежно від позиції по вакцинації, респонденти відстоюють її',fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
-
-    plot = df['Ви часто приєднуєтеся до громадських мітингів на важливі для вас теми:'].value_counts().plot.pie(ax=axes[3, 1], autopct='%.1f%%', startangle=270, fontsize=7)
-    plot.set_xlabel('Респондент часто приєднується до громадських мітингів на важливі теми',fontsize = 10)
-    plot.set_ylabel('', fontsize = 10)
-
-    ###
-
-    mng = plt.get_current_fig_manager()
-    mng.full_screen_toggle()
-
-    plt.show()
-    fig.savefig('survey-' + name + '.png', dpi=200) 
+        fig.figure.savefig('survey-' + col + '-' + name + '.png', dpi=200)
